@@ -51,9 +51,10 @@ namespace Catch {
         }
 
     public: // operators
-        auto operator == ( StringRef other ) const noexcept -> bool {
-            return m_size == other.m_size
-                && (std::memcmp( m_start, other.m_start, m_size ) == 0);
+        auto operator==( StringRef other ) const noexcept -> bool {
+            if ( m_size != other.m_size ) { return false; }
+            return m_start == other.m_start ||
+                   ( std::memcmp( m_start, other.m_start, m_size ) == 0 );
         }
         auto operator != (StringRef other) const noexcept -> bool {
             return !(*this == other);
