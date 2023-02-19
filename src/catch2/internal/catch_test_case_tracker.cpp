@@ -34,7 +34,7 @@ namespace TestCaseTracking {
         m_runState = NeedsAnotherRun;
     }
 
-    ITracker* ITracker::findChild( NameAndLocationRef nameAndLocation ) {
+    ITracker* ITracker::findChild( NameAndLocationRef const& nameAndLocation ) {
         auto it = std::find_if(
             m_children.begin(),
             m_children.end(),
@@ -173,7 +173,7 @@ namespace TestCaseTracking {
 
     bool SectionTracker::isSectionTracker() const { return true; }
 
-    SectionTracker& SectionTracker::acquire( TrackerContext& ctx, NameAndLocationRef nameAndLocation ) {
+    SectionTracker& SectionTracker::acquire( TrackerContext& ctx, NameAndLocationRef const& nameAndLocation ) {
         SectionTracker* tracker;
 
         ITracker& currentTracker = ctx.currentTracker();
