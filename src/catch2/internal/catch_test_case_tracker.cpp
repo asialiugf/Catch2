@@ -34,10 +34,6 @@ namespace TestCaseTracking {
         m_runState = NeedsAnotherRun;
     }
 
-    void ITracker::addChild( ITrackerPtr&& child ) {
-        m_children.push_back( CATCH_MOVE(child) );
-    }
-
     ITracker* ITracker::findChild( NameAndLocationRef nameAndLocation ) {
         auto it = std::find_if(
             m_children.begin(),
@@ -50,10 +46,6 @@ namespace TestCaseTracking {
 
     bool ITracker::isSectionTracker() const { return false; }
     bool ITracker::isGeneratorTracker() const { return false; }
-
-    bool ITracker::isSuccessfullyCompleted() const {
-        return m_runState == CompletedSuccessfully;
-    }
 
     bool ITracker::isOpen() const {
         return m_runState != NotStarted && !isComplete();
@@ -81,25 +73,12 @@ namespace TestCaseTracking {
         return *m_rootTracker;
     }
 
-    void TrackerContext::endRun() {
-        m_rootTracker.reset();
-        m_currentTracker = nullptr;
-        m_runState = NotStarted;
-    }
-
-    void TrackerContext::startCycle() {
-        m_currentTracker = m_rootTracker.get();
-        m_runState = Executing;
-    }
     void TrackerContext::completeCycle() {
         m_runState = CompletedCycle;
     }
 
     bool TrackerContext::completedCycle() const {
         return m_runState == CompletedCycle;
-    }
-    ITracker& TrackerContext::currentTracker() {
-        return *m_currentTracker;
     }
     void TrackerContext::setCurrentTracker( ITracker* tracker ) {
         m_currentTracker = tracker;
@@ -236,10 +215,6 @@ namespace TestCaseTracking {
     void SectionTracker::addNextFilters( std::vector<StringRef> const& filters ) {
         if( filters.size() > 1 )
             m_filters.insert( m_filters.end(), filters.begin()+1, filters.end() );
-    }
-
-    std::vector<StringRef> const& SectionTracker::getFilters() const {
-        return m_filters;
     }
 
     StringRef SectionTracker::trimmedName() const {

@@ -105,7 +105,9 @@ namespace TestCaseTracking {
         //! Returns true if tracker run to completion (successfully or not)
         virtual bool isComplete() const = 0;
         //! Returns true if tracker run to completion succesfully
-        bool isSuccessfullyCompleted() const;
+        bool isSuccessfullyCompleted() const {
+            return m_runState == CompletedSuccessfully;
+        }
         //! Returns true if tracker has started but hasn't been completed
         bool isOpen() const;
         //! Returns true iff tracker has started
@@ -117,7 +119,9 @@ namespace TestCaseTracking {
         void markAsNeedingAnotherRun();
 
         //! Register a nested ITracker
-        void addChild( ITrackerPtr&& child );
+        void addChild( ITrackerPtr&& child ) {
+            m_children.push_back( CATCH_MOVE( child ) );
+        }
         /**
          * Returns ptr to specific child if register with this tracker.
          *
@@ -164,13 +168,15 @@ namespace TestCaseTracking {
     public:
 
         ITracker& startRun();
-        void endRun();
 
-        void startCycle();
+        void startCycle() {
+            m_currentTracker = m_rootTracker.get();
+            m_runState = Executing;
+        }
         void completeCycle();
 
         bool completedCycle() const;
-        ITracker& currentTracker();
+        ITracker& currentTracker() { return *m_currentTracker; }
         void setCurrentTracker( ITracker* tracker );
     };
 
@@ -211,7 +217,7 @@ namespace TestCaseTracking {
         void addInitialFilters( std::vector<std::string> const& filters );
         void addNextFilters( std::vector<StringRef> const& filters );
         //! Returns filters active in this tracker
-        std::vector<StringRef> const& getFilters() const;
+        std::vector<StringRef> const& getFilters() const { return m_filters; }
         //! Returns whitespace-trimmed name of the tracked section
         StringRef trimmedName() const;
     };
